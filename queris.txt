@@ -1,0 +1,74 @@
+create table LMS_BOOK_ISSUE(BOOK_ISSUE_NO INT,MEMBER_ID VARCHAR(10),BOOK_CODE VARCHAR(10),
+							DATE_ISSUE DATE,DATE_RETURN DATE,DATE_RETURNED DATE,
+							BOOK_ISSUE_STATUS VARCHAR(20),FINE_RANGE VARCHAR(3),
+						   constraint pk_BOOK_ISSUE_NO primary key(BOOK_ISSUE_NO) )
+select * from lms_book_issue						   
+create table LMS_MEMBERS(MEMBER_ID VARCHAR(10),MEMBER_NAME VARCHAR(30),CITY VARCHAR(20),DATE_REGISTER DATE,
+						DATE_EXPIRE DATE,MEMBERSHIP_STATUS VARCHAR(15),
+						constraint pk_MEMBER_ID primary key(MEMBER_ID))
+select * from lms_members						
+create table LMS_BOOK_DETAILS(BOOK_CODE VARCHAR(10),BOOK_TITLE VARCHAR(50),CATEGORY VARCHAR(15),
+							 AUTHOR VARCHAR(30),PUBLICATION VARCHAR(30),PUBLISH_DATE DATE,
+							 BOOK_EDITION INT,PRICE INT,RACK_NUM VARCHAR(3),DATE_ARRIVAL DATE,
+							 SUPPLIER_ID VARCHAR(3), constraint pk_BOOK_CODE primary key(BOOK_CODE))
+select * from lms_book_details
+create table LMS_FINE_DETAILS(FINE_RANGE VARCHAR(3),FINE_AMOUNT INT,constraint pk_FINE_RANGE
+							  primary key(FINE_RANGE))
+select * from lms_fine_details							 
+create table LMS_SUPPLIERS_DETAILS(SUPPLIER_ID VARCHAR(3),SUPPLIER_NAME VARCHAR(30),
+								  ADDRESS VARCHAR(50),CONTACT INT,EMAIL VARCHAR(15),
+								  constraint pk_SUPPLIER_ID primary key(SUPPLIER_ID))
+select * from lms_suppliers_details				
+alter table LMS_BOOK_ISSUE add constraint fk_MEMBER_ID foreign key(MEMBER_ID) references LMS_MEMBERS(MEMBER_ID)
+alter table LMS_BOOK_ISSUE add constraint fk_BOOK_CODE foreign key(BOOK_CODE) references LMS_BOOK_DETAILS(BOOK_CODE)
+alter table LMS_BOOK_ISSUE add constraint fk_FINE_RANGE foreign key(FINE_RANGE) references LMS_FINE_DETAILS(FINE_RANGE)
+alter table LMS_BOOK_DETAILS add constraint fk_SUPPLIER_ID foreign key(SUPPLIER_ID) references LMS_SUPPLIERS_DETAILS(SUPPLIER_ID)
+
+insert into lms_members values ('LM001','ANKIT','MUMBAI','2022-02-12','2022-02-11','Temporary');
+insert into lms_members values ('LM002','RAM','MUMBAI','2022-04-10','2022-04-09','PERMANENT'),
+								('LM003','SHAYAM','PUNE','2012-05-13','2013-05-12','PERMANENT'),
+								('LM004','RAJ','BANGLORE','2022-04-12','2022-04-21','TEMPORARY'),
+								('LM005','RAHUL','CHENNAI','2022-03-30','2022-05-16','TEMPORARY');
+insert into lms_book_details values('BK001','A FOR APPLE','STUDENT','HARI PRAKASH','UTTAM','2015-01-01',
+								   1,200,001,'2017-01-01','SP1')
+insert into lms_book_details values('BK002','B FOR BALL','NOVEL','CHERANJIVI','NOTEBOOK','2018-02-05',
+								   3,500,002,'2018-03-05','SP2'),
+								   ('BK003','C FOR CAT','NOVEL','SHAKSPHERE','NAVNEET','2017-03-02',
+								   1,1000,003,'2017-03-08','SP2')
+insert into lms_book_details values('BK004','D FOR DOG','STORY','AMIT','CLASSMATE','2019-05-06',
+								   2,100,004,'2019-05-09','SP3')								  
+						
+insert into lms_suppliers_details values('SP1','JAKE','MUMBAI',9892953665,'JAKE@YAHOO.COM'),
+								  ('SP2','JOHN','BANGLORE',7738732757,'JOHN@GMAIL.COM'),
+								  ('SP3','MARK','CHENNAI',8878787544,'MARK@GMAIL.COM');
+
+alter table lms_suppliers_details
+alter column CONTACT SET DATA TYPE bigint;
+
+insert into lms_fine_details values('FR1',100),('FR2',200),('FR3',500);
+insert into lms_fine_details values('FR0',0)
+
+insert into lms_book_issue values(1,'LM001','BK001','2022-03-14','2022-04-14','2022-04-12','RETURNED','FR0')
+insert into lms_book_issue values(2,'LM002','BK002','2022-04-06','2022-05-06','2022-06-09','LATE','FR1'),
+								(3,'LM003','BK001','2022-05-09','2022-06-09','2022-08-10','LATE','FR3')
+insert into lms_book_issue values(4,'LM003','BK003','2022-04-06','2022-05-06','2022-06-09','NOT RETURNED','FR3')
+
+
+
+
+
+
+==================================================================queries==========================================================================
+
+select member_id,member_name,city,membership_status from lms_members where lms_members.membership_status='PERMANENT';
+
+select b.member_id,e.member_name from LMS_BOOK_ISSUE b join LMS_MEMBERS e on b.member_id=e.member_id where b.book_issue_status='NOT RETURNED'
+select b.member_id,e.member_name from LMS_BOOK_ISSUE b join LMS_MEMBERS e on b.member_id=e.member_id where b.book_code='BK002'
+select book_code,book_title,author from lms_book_details  where author like 'C%'
+select count(book_code) No_of_books from lms_book_details 
+select category,count(category) NO_OF_BOOKS from lms_book_details group by category
+select count(book_code) No_of_books from lms_book_details where author='CHERANJIVI'
+select book_code,book_title from lms_book_details where book_code in (select book_code from lms_book_issue where date_issue='2022-03-14')
+select member_id,member_name,date_register,date_expire from lms_members where date_expire < '2013-05-01'
+select member_id,member_name,date_register,membership_status from lms_members where date_register < '2022-02-14' and membership_status='Temporary'
+
